@@ -3,7 +3,7 @@
   publish = ".next"
 
 [build.environment]
-  DATABASE_URL = "file:./dev.db"
+  DATABASE_URL = "postgresql://neondb_owner:npg_kNRDpCJaUT56@ep-divine-feather-ayoo2w6d-pooler.c-5.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
