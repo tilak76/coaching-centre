@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { jwtVerify } from 'jose'
 import { redirect } from 'next/navigation'
 import LogoutButton from '../LogoutButton'
+import CourseSelector from './CourseSelector'
 
 const secretKey = 'super-secret-key-change-this-in-production'
 const key = new TextEncoder().encode(secretKey)
@@ -31,6 +32,8 @@ export default async function StudentDashboard() {
     return <div>Error loading student profile.</div>
   }
 
+  const batches = await prisma.batch.findMany()
+
   const today = new Date().toISOString().split('T')[0]
 
   // Get today's attendance
@@ -54,12 +57,15 @@ export default async function StudentDashboard() {
       </div>
 
       {student.status === 'PENDING' ? (
-        <div style={{ padding: '32px', textAlign: 'center', background: 'var(--surface)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}>
-          <h2 style={{ color: 'var(--primary)', marginBottom: '16px' }}>Approval Pending</h2>
-          <p style={{ color: 'var(--text-muted)' }}>
-            Your account is currently waiting for admin approval. You will be able to see your attendance and daily materials once you are approved.
-          </p>
-        </div>
+        <>
+          <div style={{ padding: '32px', textAlign: 'center', background: 'var(--surface)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}>
+            <h2 style={{ color: 'var(--primary)', marginBottom: '16px' }}>Approval Pending</h2>
+            <p style={{ color: 'var(--text-muted)' }}>
+              Your account is currently waiting for admin approval for the course: <strong>{student.batch.name}</strong>.
+            </p>
+          </div>
+          <CourseSelector batches={batches} currentBatchId={student.batchId} studentId={student.id} />
+        </>
       ) : (
         <>
           <div className="stats-grid">
@@ -89,6 +95,10 @@ export default async function StudentDashboard() {
             </div>
           </div>
         </>
+      )}
+
+      {student.status === 'APPROVED' && (
+        <CourseSelector batches={batches} currentBatchId={student.batchId} studentId={student.id} />
       )}
     </div>
   )
