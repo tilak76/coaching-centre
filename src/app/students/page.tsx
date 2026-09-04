@@ -13,6 +13,7 @@ interface Student {
   contact: string | null
   batch: Batch
   status: string
+  user?: { email: string }
 }
 
 export default function StudentsPage() {
@@ -113,24 +114,26 @@ export default function StudentsPage() {
               <thead>
                 <tr>
                   <th>Name</th>
-                  <th>Contact</th>
-                  <th>Batch</th>
+                  <th>Email</th>
+                  <th>Mobile</th>
+                  <th>Course/Class</th>
                   {activeTab === 'PENDING' && <th>Action</th>}
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={activeTab === 'PENDING' ? 4 : 3} style={{ textAlign: 'center' }}>Loading...</td>
+                    <td colSpan={activeTab === 'PENDING' ? 5 : 4} style={{ textAlign: 'center' }}>Loading...</td>
                   </tr>
                 ) : displayedStudents.length === 0 ? (
                   <tr>
-                    <td colSpan={activeTab === 'PENDING' ? 4 : 3} style={{ textAlign: 'center' }}>No students found in this category.</td>
+                    <td colSpan={activeTab === 'PENDING' ? 5 : 4} style={{ textAlign: 'center' }}>No students found in this category.</td>
                   </tr>
                 ) : (
                   displayedStudents.map(student => (
                     <tr key={student.id}>
                       <td style={{ fontWeight: 500 }}>{student.name}</td>
+                      <td>{student.user?.email || '-'}</td>
                       <td>{student.contact || '-'}</td>
                       <td>
                         <span className="badge" style={{ background: 'var(--surface-hover)', color: 'var(--text-main)' }}>

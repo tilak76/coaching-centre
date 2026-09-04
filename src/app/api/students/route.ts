@@ -13,7 +13,10 @@ export async function GET(request: Request) {
         ...(status ? { status } : {}) // if status is passed, use it, else get all
       },
       orderBy: { name: 'asc' },
-      include: { batch: true }
+      include: { 
+        batch: true,
+        user: { select: { email: true } }
+      }
     })
     return NextResponse.json(students)
   } catch (error) {

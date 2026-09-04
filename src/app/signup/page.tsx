@@ -56,8 +56,8 @@ export default function SignupPage() {
   const isAdmin = email.toLowerCase() === 'admin@coaching.com'
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'var(--background)' }}>
-      <div className="stat-card" style={{ width: '100%', maxWidth: '400px' }}>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: 'var(--background)', padding: '32px 16px' }}>
+      <div className="stat-card" style={{ width: '100%', maxWidth: '450px', padding: '32px' }}>
         <h2 style={{ textAlign: 'center', marginBottom: '24px' }}>Create Account</h2>
         
         {error && <div style={{ color: 'var(--danger)', marginBottom: '16px', fontSize: '14px', textAlign: 'center' }}>{error}</div>}
@@ -106,18 +106,40 @@ export default function SignupPage() {
           
           {!isAdmin && (
             <div className="form-group">
-              <label className="form-label">Select Batch</label>
-              <select 
-                className="form-input" 
-                required 
-                value={batchId}
-                onChange={e => setBatchId(e.target.value)}
-              >
-                <option value="" disabled>-- Choose your batch --</option>
+              <label className="form-label" style={{ marginBottom: '12px', display: 'block' }}>Select Course / Class</label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
                 {batches.map(b => (
-                  <option key={b.id} value={b.id}>{b.name}</option>
+                  <label 
+                    key={b.id} 
+                    style={{
+                      border: batchId === b.id ? '2px solid var(--primary)' : '1px solid var(--border)',
+                      background: batchId === b.id ? 'rgba(37, 99, 235, 0.05)' : 'var(--background)',
+                      padding: '12px 8px',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      textAlign: 'center',
+                      fontSize: '13px',
+                      fontWeight: batchId === b.id ? 600 : 400,
+                      color: batchId === b.id ? 'var(--primary)' : 'var(--text-main)',
+                      transition: 'all 0.2s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <input 
+                      type="radio" 
+                      name="batchId"
+                      value={b.id}
+                      checked={batchId === b.id}
+                      onChange={e => setBatchId(e.target.value)}
+                      style={{ display: 'none' }}
+                      required
+                    />
+                    {b.name}
+                  </label>
                 ))}
-              </select>
+              </div>
             </div>
           )}
 
