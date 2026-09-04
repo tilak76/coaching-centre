@@ -13,6 +13,7 @@ export default function SignupPage() {
   const router = useRouter()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [mobile, setMobile] = useState('')
   const [password, setPassword] = useState('')
   const [batchId, setBatchId] = useState('')
   const [error, setError] = useState('')
@@ -34,7 +35,7 @@ export default function SignupPage() {
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, batchId })
+        body: JSON.stringify({ name, email, password, batchId, contact: mobile })
       })
       
       if (res.ok) {
@@ -80,6 +81,16 @@ export default function SignupPage() {
               required 
               value={email}
               onChange={e => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Mobile Number</label>
+            <input 
+              type="text" 
+              className="form-input" 
+              required 
+              value={mobile}
+              onChange={e => setMobile(e.target.value)}
             />
           </div>
           <div className="form-group">

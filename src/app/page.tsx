@@ -1,4 +1,5 @@
 import prisma from '@/lib/prisma'
+import LogoutButton from './LogoutButton'
 
 export default async function Dashboard() {
   const studentsCount = await prisma.student.count()
@@ -15,9 +16,12 @@ export default async function Dashboard() {
 
   return (
     <div>
-      <div className="page-header">
-        <h1 className="page-title">Dashboard</h1>
-        <p className="page-subtitle">Welcome back! Here's what's happening today.</p>
+      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h1 className="page-title">Dashboard</h1>
+          <p className="page-subtitle">Welcome back! Here's what's happening today.</p>
+        </div>
+        <LogoutButton />
       </div>
 
       <div className="stats-grid">

@@ -4,6 +4,7 @@ import './globals.css'
 import Link from 'next/link'
 import { cookies } from 'next/headers'
 import { jwtVerify } from 'jose'
+import LogoutButton from './LogoutButton'
 
 const outfit = Outfit({ subsets: ['latin'] })
 
@@ -55,15 +56,25 @@ export default async function RootLayout({
             </div>
             
             <nav className="nav-links">
-              {role === 'ADMIN' ? (
+              {(role === 'ADMIN' || role === 'TEACHER') && (
                 <>
                   <Link href="/" className="nav-item">Dashboard</Link>
-                  <Link href="/batches" className="nav-item">Batches</Link>
-                  <Link href="/students" className="nav-item">Students</Link>
+                  {role === 'ADMIN' && (
+                    <>
+                      <Link href="/batches" className="nav-item">Batches</Link>
+                      <Link href="/students" className="nav-item">Students</Link>
+                    </>
+                  )}
                   <Link href="/attendance" className="nav-item">Attendance</Link>
                   <Link href="/materials" className="nav-item">Daily Materials</Link>
                 </>
-              ) : (
+              )}
+              {role === 'ADMIN' && (
+                <>
+                  <Link href="/staff" className="nav-item" style={{ borderTop: '1px solid var(--border)', marginTop: '8px', paddingTop: '16px' }}>Manage Staff</Link>
+                </>
+              )}
+              {role === 'STUDENT' && (
                 <>
                   <Link href="/student" className="nav-item">My Dashboard</Link>
                 </>
@@ -71,9 +82,7 @@ export default async function RootLayout({
             </nav>
 
             <div style={{ marginTop: 'auto' }}>
-              <form action="/api/auth/logout" method="POST">
-                <button type="submit" className="btn btn-secondary" style={{ width: '100%' }}>Logout</button>
-              </form>
+              <LogoutButton fullWidth />
             </div>
           </aside>
           

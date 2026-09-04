@@ -54,7 +54,7 @@ export default function AttendancePage() {
   const fetchAttendanceData = async () => {
     try {
       const [studentsRes, attendanceRes] = await Promise.all([
-        fetch(`/api/students?batchId=${selectedBatchId}`),
+        fetch(`/api/students?batchId=${selectedBatchId}&status=APPROVED`),
         fetch(`/api/attendance?batchId=${selectedBatchId}&date=${selectedDate}`)
       ])
       

@@ -6,7 +6,7 @@ import { cookies } from 'next/headers'
 
 export async function POST(request: Request) {
   try {
-    const { name, email, password, batchId } = await request.json()
+    const { name, email, password, batchId, contact } = await request.json()
 
     if (!name || !email || !password) {
       return NextResponse.json({ error: 'Name, email, and password are required' }, { status: 400 })
@@ -39,7 +39,9 @@ export async function POST(request: Request) {
           data: {
             name,
             batchId,
-            userId: newUser.id
+            contact,
+            userId: newUser.id,
+            status: 'PENDING'
           }
         })
       }

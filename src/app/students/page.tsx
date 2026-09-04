@@ -12,12 +12,14 @@ interface Student {
   name: string
   contact: string | null
   batch: Batch
+  status: string
 }
 
 export default function StudentsPage() {
   const [students, setStudents] = useState<Student[]>([])
   const [batches, setBatches] = useState<Batch[]>([])
   const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState<'APPROVED' | 'PENDING'>('APPROVED')
   
   const [newName, setNewName] = useState('')
   const [newContact, setNewContact] = useState('')
@@ -39,6 +41,19 @@ export default function StudentsPage() {
       console.error('Failed to fetch data', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleApprove = async (id: string) => {
+    try {
+      const res = await fetch('/api/students', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status: 'APPROVED' })
+      })
+      if (res.ok) fetchData()
+    } catch (error) {
+      console.error('Failed to approve student', error)
     }
   }
 
@@ -66,6 +81,9 @@ export default function StudentsPage() {
     }
   }
 
+  const displayedStudents = students.filter(s => s.status === activeTab)
+  const pendingCount = students.filter(s => s.status === 'PENDING').length
+
   return (
     <div>
       <div className="page-header">
@@ -74,39 +92,68 @@ export default function StudentsPage() {
       </div>
 
       <div style={{ display: 'flex', gap: '32px', alignItems: 'flex-start' }}>
-        <div className="table-container" style={{ flex: 2 }}>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Contact</th>
-                <th>Batch</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
+        <div style={{ flex: 2 }}>
+          <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+            <button 
+              className={`btn ${activeTab === 'APPROVED' ? 'btn-primary' : 'btn-secondary'}`}
+              onClick={() => setActiveTab('APPROVED')}
+            >
+              Approved Students
+            </button>
+            <button 
+              className={`btn ${activeTab === 'PENDING' ? 'btn-primary' : 'btn-secondary'}`}
+              onClick={() => setActiveTab('PENDING')}
+            >
+              Pending Approvals {pendingCount > 0 && <span style={{ background: 'white', color: 'var(--primary)', padding: '2px 8px', borderRadius: '12px', marginLeft: '8px', fontSize: '12px', fontWeight: 'bold' }}>{pendingCount}</span>}
+            </button>
+          </div>
+
+          <div className="table-container">
+            <table className="data-table">
+              <thead>
                 <tr>
-                  <td colSpan={3} style={{ textAlign: 'center' }}>Loading...</td>
+                  <th>Name</th>
+                  <th>Contact</th>
+                  <th>Batch</th>
+                  {activeTab === 'PENDING' && <th>Action</th>}
                 </tr>
-              ) : students.length === 0 ? (
-                <tr>
-                  <td colSpan={3} style={{ textAlign: 'center' }}>No students found. Add one to get started.</td>
-                </tr>
-              ) : (
-                students.map(student => (
-                  <tr key={student.id}>
-                    <td style={{ fontWeight: 500 }}>{student.name}</td>
-                    <td>{student.contact || '-'}</td>
-                    <td>
-                      <span className="badge" style={{ background: 'var(--surface-hover)', color: 'var(--text-main)' }}>
-                        {student.batch.name}
-                      </span>
-                    </td>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan={activeTab === 'PENDING' ? 4 : 3} style={{ textAlign: 'center' }}>Loading...</td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : displayedStudents.length === 0 ? (
+                  <tr>
+                    <td colSpan={activeTab === 'PENDING' ? 4 : 3} style={{ textAlign: 'center' }}>No students found in this category.</td>
+                  </tr>
+                ) : (
+                  displayedStudents.map(student => (
+                    <tr key={student.id}>
+                      <td style={{ fontWeight: 500 }}>{student.name}</td>
+                      <td>{student.contact || '-'}</td>
+                      <td>
+                        <span className="badge" style={{ background: 'var(--surface-hover)', color: 'var(--text-main)' }}>
+                          {student.batch.name}
+                        </span>
+                      </td>
+                      {activeTab === 'PENDING' && (
+                        <td>
+                          <button 
+                            className="btn btn-primary" 
+                            style={{ padding: '4px 12px', fontSize: '12px' }}
+                            onClick={() => handleApprove(student.id)}
+                          >
+                            Approve
+                          </button>
+                        </td>
+                      )}
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div className="table-container" style={{ flex: 1, padding: '24px' }}>
@@ -124,13 +171,14 @@ export default function StudentsPage() {
               />
             </div>
             <div className="form-group">
-              <label className="form-label">Contact (Optional)</label>
+              <label className="form-label">Mobile Number</label>
               <input 
                 type="text" 
                 className="form-input" 
                 placeholder="e.g. +91 9876543210"
                 value={newContact}
                 onChange={e => setNewContact(e.target.value)}
+                required
               />
             </div>
             <div className="form-group">

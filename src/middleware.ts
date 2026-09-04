@@ -23,7 +23,7 @@ export async function middleware(request: NextRequest) {
 
   // If trying to access public paths while logged in, redirect to dashboard
   if (isPublicPath && payload) {
-    if (payload.role === 'ADMIN') {
+    if (payload.role === 'ADMIN' || payload.role === 'TEACHER') {
       return NextResponse.redirect(new URL('/', request.url))
     } else {
       return NextResponse.redirect(new URL('/student', request.url))
@@ -41,14 +41,20 @@ export async function middleware(request: NextRequest) {
   // Role-based access control
   if (payload && !isPublicPath) {
     const isStudentPath = request.nextUrl.pathname.startsWith('/student')
+    const isStaffPath = request.nextUrl.pathname.startsWith('/staff')
     
     if (payload.role === 'STUDENT' && !isStudentPath && !request.nextUrl.pathname.startsWith('/api')) {
       // Students trying to access admin pages
       return NextResponse.redirect(new URL('/student', request.url))
     }
     
-    if (payload.role === 'ADMIN' && isStudentPath) {
-      // Admins trying to access student pages (they should use admin dashboard)
+    if ((payload.role === 'ADMIN' || payload.role === 'TEACHER') && isStudentPath) {
+      // Staff trying to access student pages (they should use admin dashboard)
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+
+    if (payload.role === 'TEACHER' && (isStaffPath || request.nextUrl.pathname.startsWith('/batches') || request.nextUrl.pathname.startsWith('/students'))) {
+      // Teachers trying to access admin-only management pages
       return NextResponse.redirect(new URL('/', request.url))
     }
   }
